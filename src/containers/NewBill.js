@@ -21,38 +21,36 @@ export default class NewBill {
     e.preventDefault()
     const fileInput = this.document.querySelector(`input[data-testid="file"]`)
     const file = fileInput.files[0]
-    const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i
-    const filePath = fileInput.value
-
-    // contrôle de l'extension du fichier sélectionné
-    if (!allowedExtensions.test(filePath)) {
+    const fileName = file ? file.name : ''
+    const extension = fileName.split('.').pop().toLowerCase()
+  
+    if (!['jpg', 'jpeg', 'png'].includes(extension)) {
       alert('Erreur : seuls les fichiers JPG, JPEG et PNG sont autorisés')
       fileInput.value = ''
-      return
+    } else {
+      const formData = new FormData()
+      const email = JSON.parse(localStorage.getItem('user')).email
+      formData.append('file', file)
+      formData.append('email', email)
+  
+      this.store
+        .bills()
+        .create({
+          data: formData,
+          headers: {
+            noContentType: true,
+          },
+        })
+        .then(({ fileUrl, key }) => {
+          console.log(fileUrl)
+          this.billId = key
+          this.fileUrl = fileUrl
+          this.fileName = fileName
+        })
+        .catch((error) => console.error(error))
     }
-
-    const fileName = filePath.substring(filePath.lastIndexOf('\\') + 1)
-    const formData = new FormData()
-    const email = JSON.parse(localStorage.getItem('user')).email
-    formData.append('file', file)
-    formData.append('email', email)
-
-    this.store
-      .bills()
-      .create({
-        data: formData,
-        headers: {
-          noContentType: true,
-        },
-      })
-      .then(({ fileUrl, key }) => {
-        console.log(fileUrl)
-        this.billId = key
-        this.fileUrl = fileUrl
-        this.fileName = fileName
-      })
-      .catch((error) => console.error(error))
   }
+  
 
   handleSubmit = (e) => {
     e.preventDefault()

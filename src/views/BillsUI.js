@@ -4,27 +4,6 @@ import LoadingPage from './LoadingPage.js'
 
 import Actions from './Actions.js'
 
-const parseDate = (str) => {
-  const [day, monthStr, year] = str.split(' ')
-  const monthsMap = {
-    'Jan.': 0,
-    'Fév.': 1,
-    'Mar.': 2,
-    'Avr.': 3,
-    'Mai.': 4,
-    'Jui.': 5,
-    'Jui.': 6,
-    'Août': 7,
-    'Sept.': 8,
-    'Oct.': 9,
-    'Nov.': 10,
-    'Déc.': 11,
-  }
-  const month = monthsMap[monthStr]
-  const date = new Date(`20${year}`, month, day)
-  return date
-}
-
 const row = (bill) => {
   return `
     <tr>
@@ -44,7 +23,6 @@ const rows = (data) => {
   return data && data.length
     ? data
         .sort((a, b) => new Date(b.date) - new Date(a.date))
-        .sort((a, b) => parseDate(a.date) - parseDate(b.date))
         .map((bill) => row(bill))
         .join('')
     : ''
